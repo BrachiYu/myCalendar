@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' >
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://axios-http.com"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth'
+        });
+        calendar.render();
+      });
+
+      // document.addEventListener('DOMContentLoaded', function() {
+        axios.get("https://localhost:7021/api/Events").then((res) =>{
+          var calendarEl = document.getElementById('calendar');
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: res.data,
+        });
+        calendar.render();
+        const sel=document.getElementById("select");
+        for(let i=0;i<res.data.length;i++)
+            {
+              const x= document.createElement("option");
+              x.id=res.data[i].id;
+              x.text=res.data[i].title+" "+x.id;
+              sel.appendChild(x);
+            }
+        });
+      
+      function addEvent(){
+        axios.post("https://localhost:7021/api/Events",{
+          "title":document.getElementById("txt1").value,
+          "start":document.getElementById("date").value
+        }).then(res =>{
+          console.log(res.data)
+        })}
+
+        function Delete_Update(){
+          document.addEventListener("DOMContentLoaded", function() {
+          axios.get("https://localhost:7021/api/Events").then((res)=> {
+          var calendarEl = document.getElementById("calendar");
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            events: res.data,
+             });
+           });
+         });
+        // let id=document.getElementById("select").firstChild.value.substr(0,event.target.value.indexOf(" "));
+        let id=document.getElementById("txt2").value;
+         axios.delete(`https://localhost:7021/api/Events/${id}`)
+        .then(res=> {
+         });
+       }
+   
+    </script>
+  </head>
+  <body>
+    <div  style="display:flex;border: 2px rgb(211, 12, 45) solid;justify-content: space-around; height:30px;">
+        <div id="addWrapper" style="display:flex;">
+            <input id="txt1" type="text">
+            <input id="date" type="date">
+            <button id="ok"  onclick="addEvent()">Add</button>
+        </div>
+        <div id="duWrapper" style="display:flex;" >
+            <button onclick="Delete_Update()">Delete</button>
+            <select id="select"></select>
+            <input id="txt2" type="text">
+            <button onclick="Delete_Update()">Update</button>
+        </div>
+    </div>
+    <div id='calendar'></div>
+  </body>
+</html>
